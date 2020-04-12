@@ -1,4 +1,10 @@
-#🎸 ʟᴇᴏɴɪᴅ ᴇʀᴅᴍᴀɴ
+# Built application files
+*.apk
+*.ap_
+*.aab
+
+# Local configuration file (sdk path, etc)
+local.properties
 
 # Gradle files
 .gradle/
@@ -14,3 +20,13 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Version control
+vcs.xml
+
+# lint
+lint/intermediates/
+lint/generated/
+lint/outputs/
+lint/tmp/
+lint/reports/
