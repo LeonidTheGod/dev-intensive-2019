@@ -1,10 +1,9 @@
 package ru.skillbranch.devintensive.utils
 
-import java.lang.Exception
 import java.util.*
 
 object Utils {
-    var letterTransliters = mapOf("а" to "a", "б" to "b", "в" to "v",
+    var TranslMap = mapOf("а" to "a", "б" to "b", "в" to "v",
         "г" to "g", "д" to "d", "е" to "e", "ё" to "e", "ж" to "zh", "з" to "z",
         "и" to "i", "й" to "i", "к" to "k", "л" to "l", "м" to "m",
         "н" to "n", "о" to "o", "п" to "p", "р" to "r", "с" to "s", "т" to "t",
@@ -13,38 +12,33 @@ object Utils {
         "э" to "e", "ю" to "yu", "я" to "ya")
 
     fun parseFullName(fullName: String?): Pair<String?, String?> {
-        val parts = fullName?.split(" ")
+        val parts = fullName?.trim()?.split(" ")
 
-        val firstName = parts?.getOrNull(0)
-        val lastName = parts?.getOrNull(1)
+        val firstName = if (parts?.getOrNull(0) != "") parts?.getOrNull(0) else null
+        val lastName = if (parts?.getOrNull(1) != "") parts?.getOrNull(1) else null
         return firstName to lastName
     }
 
     fun transliteration(payload: String, divider: String =" "): String {
+        var word = ""
 
-        if (payload.split(" ").size < 2) return ""
-
-        var firstPart = ""
-        var lastPart = ""
-        val (firstName, lastName) = payload.split(" ")
-
-        for (i in firstName.toLowerCase(Locale.ROOT))
-            firstPart += if (i.toString() in letterTransliters) letterTransliters[i.toString()] else i
-
-        for (i in lastName.toLowerCase(Locale.ROOT))
-            lastPart += if (i.toString() in letterTransliters) letterTransliters[i.toString()] else i
-
-        return firstPart.capitalize() + divider + lastPart.capitalize()
+        for (i in payload)
+            word += when{
+                (i.isUpperCase()) -> TranslMap[i.toString().toLowerCase(Locale.ROOT)]?.capitalize() ?: i.toString()
+                (i.toString() in TranslMap) -> TranslMap[i.toString()]
+                else -> i}
+        return word.replace(Regex(" +"), divider)
     }
 
     fun toInitials(firstName: String?, lastName: String?): String? {
 
-        val firstLetter = firstName?.getOrNull(0)?.toUpperCase()
-        val secondLetter = lastName?.getOrNull(0)?.toUpperCase()
+        val firstLetter = firstName?.trim()?.getOrNull(0)?.toUpperCase()
+        val secondLetter = lastName?.trim()?.getOrNull(0)?.toUpperCase()
 
-        return if ((firstLetter in 'A'..'z' || firstLetter in 'А'..'я')&&
-            (secondLetter in 'A'..'z' || secondLetter in 'А'..'я')) "$firstLetter$secondLetter"
-        else if (firstLetter in 'A'..'z' || firstLetter in 'А'..'я') "$firstLetter"
+        return if ((firstLetter in 'A'..'Z' || firstLetter in 'А'..'Я')&&
+            (secondLetter in 'A'..'Z' || secondLetter in 'А'..'Я')) "$firstLetter$secondLetter"
+        else if (firstLetter in 'A'..'Z' || firstLetter in 'А'..'Я') "$firstLetter"
+        else if (secondLetter in 'A'..'Z' || secondLetter in 'А'..'Я') "$secondLetter"
         else null
     }
 }

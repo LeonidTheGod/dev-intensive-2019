@@ -31,27 +31,30 @@ fun Date.add(value: Int, units: TimeUnits = TimeUnits.SECOND): Date{
 
 fun Date.humanizeDiff(date:Date = Date()): String {
 
-    val inputDateString = this.format("ss, mm, HH, dd, MM, yy").split(", ")
-    val nowDateString = date.format("ss, mm, HH, dd, MM, yy").split(", ")
-    val diff = mutableListOf<Int>()
+    val diff = ((date.time - this.time)/1000).toInt()
 
-    for (i in 0 until 6) {
-        diff.add(nowDateString[i].toInt() - inputDateString[i].toInt())
-    }
-
-    return when(val timeSec = (diff[0] + diff[1]*60 +
-            diff[2]*60*60 + diff[3]*60*60*24 +
-            diff[4]*30*60*60*24 + diff[5]*365*60*60*24)) {
+    return if (diff >= 0) when(diff) {
         in 0..1 -> "только что"
         in 2..45 -> "несколько секунд назад"
         in 46..75 -> "минуту назад"
-        in 76..45 * 60 -> TimeUnits.MINUTE.plural(timeSec/60) + " назад"
-        in 45 * 60 + 1..75 * 60 -> "час назад"
-        in 75 * 60 + 1..22 * 3600 -> TimeUnits.HOUR.plural(timeSec/60/60) + " назад"
-        in 22 * 3600 + 1..26 * 3600 -> "день назад"
-        in 26 * 3600 + 1..360 * 86400 -> TimeUnits.DAY.plural(timeSec/60/60/24) + " назад"
-        in 360 * 86400 + 1..214700000000000 -> "более года назад"
-        else -> ""
+        in 76..45 * 60 -> TimeUnits.MINUTE.plural(diff / 60) + " назад"
+        in 45 * 60..75 * 60 -> "час назад"
+        in 75 * 60..22 * 3600 -> TimeUnits.HOUR.plural(diff / 60 / 60) + " назад"
+        in 22 * 3600..26 * 3600 -> "день назад"
+        in 26 * 3600..360 * 86400 -> TimeUnits.DAY.plural(diff / 60 / 60 / 24) + " назад"
+        else -> "более года назад"
+    }
+    else when(diff) {
+
+        in 0 downTo -1 -> "только что"
+        in -2 downTo -45 -> "через несколько секунд"
+        in -46 downTo -75 -> "через минуту"
+        in -76 downTo -45 * 60 -> "через " + TimeUnits.MINUTE.plural(-diff / 60)
+        in -45 * 60 downTo -75 * 60 -> "через час"
+        in -75 * 60 downTo -22 * 3600 -> "через " + TimeUnits.HOUR.plural(-diff / 60 / 60)
+        in -22 * 3600 downTo -26 * 3600 -> "через день"
+        in -26 * 3600 downTo -360 * 86400 -> "через " + TimeUnits.DAY.plural(-diff / 60 / 60 / 24)
+        else -> "более чем через год"
     }
 }
 
